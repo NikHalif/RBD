@@ -252,6 +252,7 @@ namespace RBD
                             }
                         }
 
+                        List<BsonDocument> listResultFull = new List<BsonDocument>();
                         // --- Загрузка документов
                         void LoadDate(object sender, EventArgs e)
                         {
@@ -312,6 +313,8 @@ namespace RBD
                             }
                             else people = collection.Find(filter);
 
+                            listResultFull = people.ToList();
+
                             textFilerName = textBoxVis.Text.Trim();
                             if (CheckBoxVis.IsChecked == true && textFilerName.Length > 0) people = people.Project("{" + GenerStr(textFilerName) + "}");
 
@@ -324,6 +327,14 @@ namespace RBD
 
                         buttonUpdate.Click += LoadDate;
                         listBox.SelectionChanged += LoadDate;
+
+                        listBoxResult.MouseDoubleClick += delegate (object sender, System.Windows.Input.MouseButtonEventArgs e)
+                        {
+                            if (client == null || listBoxResult.SelectedIndex == -1 || listBoxResult.SelectedItems.Count > 1) return;
+                            var tItem = (BsonDocument)listBoxResult.SelectedItem;
+
+                            MessageBox.Show(listResultFull[listBoxResult.SelectedIndex].ToString());
+                        };
 
                         grid.Children.Add(listBox);
                         grid.Children.Add(listBoxResult);
@@ -341,7 +352,7 @@ namespace RBD
         protected String GenerStr(String text)
         {
             var str = text.Trim().Split(',');
-            if(str.Length <= 1) return $"{str[0].Trim()}:1, _id:0";
+            if(str.Length <= 1) return $"{str[0].Trim()}:1,_id:0";
             else
             {
                 String sTemp = "";
